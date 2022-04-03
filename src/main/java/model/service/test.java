@@ -20,23 +20,6 @@ public class test {
 		// local SessionFactory bean created
 		SessionFactory sessionFactory = config.buildSessionFactory();
 		Session session = sessionFactory.openSession();
-//		session.beginTransaction();
-//		Offre o = new Offre();
-//
-//		User u = new DAOUser().getUserById(1);
-//		TypeOffre to = new DAOTypeOffre().getTypeId("cdi");
-//
-//		System.out.println(u);
-//		System.out.println(to);
-//
-//		o.setTitre("toto");
-//		o.setDescription("hellloooooooooo");
-//		o.setType(to);
-//		o.setCreateur(u);
-//
-//		new DAOOffre().insererOffre(o);
-//		session.getTransaction().commit();
-//		session.close();
-//	
+	
 	}
 }

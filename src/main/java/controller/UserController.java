@@ -1,38 +1,39 @@
 package controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
+
+import com.oreilly.servlet.MultipartRequest;
 
 import model.bo.Offre;
+import model.bo.Postulations;
 import model.bo.TypeOffre;
 import model.bo.User;
 import model.dao.DAOOffre;
+import model.dao.DAOPostulations;
 import model.dao.DAOTypeOffre;
 import model.dao.DAOUser;
 
-//@WebServlet("/")
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
+		maxFileSize = 1024 * 1024 * 10, // 10 MB
+		maxRequestSize = 1024 * 1024 * 100 // 100 MB
+)
 public class UserController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public void init() {
-
-	}
-
-	public static String getAction(HttpServletRequest request) {
-		String act[] = request.getRequestURL().toString().split("/");
-		return act[act.length - 1];
-	}
-
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		System.out.println("Post : "+request.getPathInfo());
+		System.out.println("Post : " + request.getPathInfo());
 		switch (request.getPathInfo()) {
 		case "/inserer":
 			System.out.println("insertion");
@@ -53,6 +54,9 @@ public class UserController extends HttpServlet {
 		case "/inscription":
 			inscription(request, response);
 			break;
+		case "/postuler":
+			postuler(request, response);
+			break;
 		default:
 			break;
 		}
@@ -61,10 +65,11 @@ public class UserController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		System.out.println("Get : "+request.getPathInfo());
+		RequestDispatcher dispatcher;
+		System.out.println("Get : " + request.getPathInfo());
 		switch (request.getPathInfo()) {
 		case "/inserer":
-			
+
 			request.getRequestDispatcher("/register.jsp").forward(request, response);
 			break;
 		case "/offres":
@@ -78,7 +83,7 @@ public class UserController extends HttpServlet {
 		case "/modifier":
 			int id = Integer.parseInt(request.getParameter("id"));
 			request.setAttribute("offre", new DAOOffre().getOffreByID(id));
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/modifier.jsp");
+			dispatcher = request.getRequestDispatcher("/modifier.jsp");
 			dispatcher.forward(request, response);
 			break;
 
@@ -88,13 +93,47 @@ public class UserController extends HttpServlet {
 			deleteOffre(request, response);
 			listOffres(request, response);
 			break;
-
+		case "/demande":
+			dispatcher = request.getRequestDispatcher("/Postuler.jsp");
+			dispatcher.forward(request, response);
+			break;
 		default:
 			break;
 		}
 
 	}
-	
+
+	private void postuler(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		/* Receive file uploaded to the Servlet from the HTML5 form */
+		Part filePart = request.getPart("cv");
+		String cv = filePart.getSubmittedFileName();
+		for (Part part : request.getParts()) {
+			part.write("C:\\upload\\" + cv);
+		}
+
+		filePart = request.getPart("lm");
+		String lm = filePart.getSubmittedFileName();
+		for (Part part : request.getParts()) {
+			part.write("C:\\upload\\" + lm);
+		}
+
+		// acceder a la session pour utiliser les donnees d'utilisateur courant
+		HttpSession session = request.getSession();
+		// garder l'utilisateur courant dans (u)
+		User u = (User) session.getAttribute("user");
+		int id = Integer.parseInt(request.getParameter("id"));
+		System.out.println("le id :" + id);
+		u = new DAOUser().getUserById(u.getId());
+		Offre o = new DAOOffre().getOffreByID(id);
+
+		Postulations post = new Postulations(cv, lm);
+		post.setDemandeur(u);
+		post.setOffre(o);
+
+		new DAOPostulations().postuler(post);
+
+	}
 
 	private void inscription(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -110,7 +149,6 @@ public class UserController extends HttpServlet {
 		dispatcher.forward(request, response);
 
 	}
-
 
 	private void deleteOffre(HttpServletRequest request, HttpServletResponse response) {
 		System.out.println("Dans deleteOffre()");
@@ -169,7 +207,7 @@ public class UserController extends HttpServlet {
 		String type = request.getParameter("inputType");
 		// acceder a la session pour utiliser les donnees d'utilisateur courant
 		HttpSession session = request.getSession();
-		// garder l'utilisateur cournat dans (u)
+		// garder l'utilisateur courant dans (u)
 		User u = (User) session.getAttribute("user");
 		// creatin de l'offre
 		Offre o = new Offre(titre, description);

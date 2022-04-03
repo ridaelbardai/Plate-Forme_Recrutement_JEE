@@ -26,15 +26,23 @@
 					<p class="card-text">
 						<c:out value='${item.getDescription()}' />
 					</p>
-					<a class="btn btn-primary"
-						href="<%=request.getContextPath()%>/UserController/modifier?id=${item.getId()}"
-						class="card-link">Modifier</a> <a class="btn btn-primary"
-						href="<%=request.getContextPath()%>/UserController/supprimer?id=${item.getId()}"
-						class="card-link">Supprimer</a>
+					<c:if test="${user.getType() == 'a'}">
+						<a class="btn btn-primary"
+							href="<%=request.getContextPath()%>/UserController/modifier?id=${item.getId()}"
+							class="card-link">Modifier</a>
+						<a class="btn btn-primary"
+							href="<%=request.getContextPath()%>/UserController/supprimer?id=${item.getId()}"
+							class="card-link">Supprimer</a>
+					</c:if>
+
+					<c:if test="${user.getType() == 'u'}">
+						<a class="btn btn-primary"
+							href="<%=request.getContextPath()%>/UserController/demande?id=${item.getId()}"
+							class="card-link">Postuler</a>
+					</c:if>
 				</div>
 			</div>
 		</c:forEach>
-
 	</div>
 </body>
 </html>

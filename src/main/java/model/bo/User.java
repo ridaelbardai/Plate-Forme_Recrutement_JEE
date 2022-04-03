@@ -11,6 +11,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -41,6 +44,12 @@ public class User implements Serializable {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "createur", cascade = CascadeType.ALL)
     private Set<Offre> mesOffres;
     
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "demandeur", cascade = CascadeType.ALL)
+    private Set<Postulations> mesDemandes;
+    
+
+    
+    
     public User() {
 		super();
 	}
@@ -68,6 +77,16 @@ public class User implements Serializable {
 	}
 	
 	
+	public Set<Postulations> getMesDemandes() {
+		return mesDemandes;
+	}
+
+
+	public void setMesDemandes(Set<Postulations> mesDemandes) {
+		this.mesDemandes = mesDemandes;
+	}
+
+
 	public int getId() {
 		return id;
 	}
