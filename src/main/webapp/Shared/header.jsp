@@ -1,9 +1,12 @@
+<%@page import="org.hibernate.internal.build.AllowSysOut"%>
+<%@ page import="javax.servlet.http.HttpSession"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
-
+  
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
 	rel="stylesheet"
@@ -19,11 +22,12 @@
 				<a class="navbar-brand" href="#">Recrutement</a>
 			</div>
 			<ul class="navbar-nav">
+			<c:if test="${user.getType().equals('a')}">
 				<li class="nav-item"><a class="nav-link"
 					href="<%=request.getContextPath()%>/UserController/inserer">Inserer</a></li>
+			</c:if>
 				<li class="nav-item"><a class="nav-link"
 					href="<%=request.getContextPath()%>/UserController/offres">Offres</a></li>
-
 			</ul>
 		</div>
 	</nav>

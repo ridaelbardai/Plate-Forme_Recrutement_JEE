@@ -5,6 +5,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import controller.UserController;
 import model.bo.Offre;
 import model.bo.User;
 import model.service.HibernateUtil;
@@ -30,9 +31,7 @@ public class DAOOffre {
 
 	public List<Offre> getListOffres() {
 		Session session = HibernateUtil.getSessionFactory().openSession();
-
-		return session.createQuery("FROM Offre").list();
-
+		return session.createQuery("FROM Offre WHERE id NOT IN( SELECT offre FROM Postulations WHERE demandeur ="+ UserController.userSession.getId()+")").list();
 	}
 
 	public Offre getOffreByID(int id) {
@@ -82,5 +81,11 @@ public class DAOOffre {
 //			}
 			e.getMessage();
 		}
+	}
+
+
+	public List<Offre> getListOffresadmin() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		return session.createQuery("FROM Offre WHERE createur ="+ UserController.userSession.getId()).list();
 	}
 }

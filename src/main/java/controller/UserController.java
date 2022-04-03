@@ -1,6 +1,5 @@
 package controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -12,8 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
-
-import com.oreilly.servlet.MultipartRequest;
 
 import model.bo.Offre;
 import model.bo.Postulations;
@@ -30,6 +27,7 @@ import model.dao.DAOUser;
 )
 public class UserController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	public static User userSession;
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -49,7 +47,7 @@ public class UserController extends HttpServlet {
 			break;
 		case "/updateOffre":
 			updateOffre(request, response);
-			listOffres(request, response);
+			listOffresuser(request, response);
 			break;
 		case "/inscription":
 			inscription(request, response);
@@ -73,7 +71,10 @@ public class UserController extends HttpServlet {
 			request.getRequestDispatcher("/register.jsp").forward(request, response);
 			break;
 		case "/offres":
-			listOffres(request, response);
+			if (userSession.getType().equals("u"))
+				listOffresuser(request, response);
+			if (userSession.getType().equals("a"))
+				listOffresadmin(request, response);
 
 			break;
 		case "/login":
@@ -91,9 +92,11 @@ public class UserController extends HttpServlet {
 			System.out.println("Dans /supprimer");
 
 			deleteOffre(request, response);
-			listOffres(request, response);
+			listOffresuser(request, response);
 			break;
 		case "/demande":
+			int idp = Integer.parseInt(request.getParameter("id"));
+			System.out.println(idp);
 			dispatcher = request.getRequestDispatcher("/Postuler.jsp");
 			dispatcher.forward(request, response);
 			break;
@@ -119,19 +122,15 @@ public class UserController extends HttpServlet {
 		}
 
 		// acceder a la session pour utiliser les donnees d'utilisateur courant
-		HttpSession session = request.getSession();
-		// garder l'utilisateur courant dans (u)
-		User u = (User) session.getAttribute("user");
 		int id = Integer.parseInt(request.getParameter("id"));
-		System.out.println("le id :" + id);
-		u = new DAOUser().getUserById(u.getId());
 		Offre o = new DAOOffre().getOffreByID(id);
 
 		Postulations post = new Postulations(cv, lm);
-		post.setDemandeur(u);
+		post.setDemandeur(userSession);
 		post.setOffre(o);
 
 		new DAOPostulations().postuler(post);
+		listOffresuser(request, response);
 
 	}
 
@@ -172,6 +171,7 @@ public class UserController extends HttpServlet {
 		}
 	}
 
+	//MAJ
 	private void updateOffre(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String titre = request.getParameter("titre");
@@ -190,8 +190,8 @@ public class UserController extends HttpServlet {
 		new DAOOffre().updateOffre(o);
 
 	}
-
-	private void listOffres(HttpServletRequest request, HttpServletResponse response)
+	//afficher les offres pour un utilisateur
+	private void listOffresuser(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		List<Offre> lo = new DAOOffre().getListOffres();
 		request.setAttribute("lo", lo);
@@ -199,6 +199,18 @@ public class UserController extends HttpServlet {
 		dispatcher.forward(request, response);
 	}
 
+	
+	//afficher les offres pour un admin
+	private void listOffresadmin(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		List<Offre> lo = new DAOOffre().getListOffresadmin();
+		request.setAttribute("lo", lo);
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/offres.jsp");
+		dispatcher.forward(request, response);
+
+	}
+
+	//inserer une offre
 	private void register(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		// pour garder les informations comme titre, description, type d'offre
@@ -224,17 +236,18 @@ public class UserController extends HttpServlet {
 		dispatcher.forward(request, response);
 	}
 
+	//authentification
 	private void authenticate(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		DAOUser loginDao = new DAOUser();
 		String username = request.getParameter("email");
 		String password = request.getParameter("password");
-		User user = loginDao.validate(username, password);
+		userSession = loginDao.validate(username, password);
 		HttpSession session = request.getSession();
-		session.setAttribute("user", user);
+		session.setAttribute("user", userSession);
 
-		if (user != null) {
+		if (userSession != null) {
 			System.out.println("User valide ");
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/register.jsp");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/offres.jsp");
 			dispatcher.forward(request, response);
 		} else {
 			System.out.println("User non valide ");

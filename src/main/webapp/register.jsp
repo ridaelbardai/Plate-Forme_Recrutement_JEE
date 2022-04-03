@@ -9,9 +9,6 @@
 
 <body>
 <jsp:include page="/Shared/header.jsp"></jsp:include>
-	<c:if test="${user.getType().equals('a')}">
-		<c:out value="${user.getFirstName()}"></c:out>
-	</c:if>
 	<div class="container">
 		<div class="row text-center" style="color: tomato;">
 			<h2>Ajout d'offre</h2>
