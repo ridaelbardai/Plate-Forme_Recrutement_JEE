@@ -73,6 +73,10 @@ public class UserController extends HttpServlet {
 			throws ServletException, IOException {
 		RequestDispatcher dispatcher;
 		System.out.println("Get : " + request.getPathInfo());
+		if (userSession == null) {
+			request.getRequestDispatcher("/login.jsp").forward(request, response);
+
+		}
 		switch (request.getPathInfo()) {
 		case "/inserer":
 
@@ -130,7 +134,11 @@ public class UserController extends HttpServlet {
 			out.close();
 
 			break;
-
+		case "/logout":
+			HttpSession session = request.getSession(false);
+			if (session != null)
+				session.invalidate();
+			request.getRequestDispatcher("/login.jsp").forward(request, response);
 		default:
 			break;
 		}
@@ -141,9 +149,11 @@ public class UserController extends HttpServlet {
 			throws ServletException, IOException {
 		int id = Integer.parseInt(request.getParameter("id"));
 		List<Postulations> mo = new DAOPostulations().getListDemandes(id);
+		Offre off = new DAOOffre().getOffreByID(id);
 		System.out.println("liste des offres :");
 		System.out.println(mo);
 		request.setAttribute("mo", mo);
+		request.setAttribute("off", off);
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/demandes.jsp");
 		dispatcher.forward(request, response);
 
@@ -163,7 +173,7 @@ public class UserController extends HttpServlet {
 
 		filePart = request.getPart("lm");
 		String lm = request.getPart("lm").getSubmittedFileName();
-		;
+
 //		lm.concat(filePart.getSubmittedFileName());
 		System.out.println("lm : " + lm);
 
@@ -300,8 +310,13 @@ public class UserController extends HttpServlet {
 
 		if (userSession != null) {
 			System.out.println("User valide ");
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/offres.jsp");
-			dispatcher.forward(request, response);
+			if (userSession.getType().equals("u"))
+				listOffresuser(request, response);
+			if (userSession.getType().equals("a"))
+				listOffresadmin(request, response);
+
+//			RequestDispatcher dispatcher = request.getRequestDispatcher("/offres.jsp");
+//			dispatcher.forward(request, response);
 		} else {
 			System.out.println("User non valide ");
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/login.jsp");

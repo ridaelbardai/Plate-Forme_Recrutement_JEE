@@ -12,21 +12,26 @@
 </head>
 <body>
 
- <div class="container col-md-8 col-md-offset-3" style="overflow: auto">
+ <div class="container col-md-3 col-md-offset-3 mb-4" style="overflow: auto">
   <h1>Login Form</h1>
   <form action="<%=request.getContextPath()%>/UserController/login" method="post">
-   <div class="form-group">
-    <label for="email">User Name:</label> <input type="text"
+   <div class="form-group mt-5">
+    <label for="email">Adresse mail:</label> <input type="text"
      class="form-control" id="email" placeholder="Email"
      name="email" required>
    </div>
    <div class="form-group">
-    <label for="uname">Password:</label> <input type="password"
+    <label for="uname">Mot de passe:</label> <input type="password"
      class="form-control" id="password" placeholder="Password"
      name="password" required>
    </div>
-   <button type="submit" class="btn btn-primary">Submit</button>
+   <div class="d-flex justify-content-center">
+   <button type="submit" class="btn btn-success">Submit</button>
+   </div>
   </form>
+ </div >
+ <div >
+  <img style="display: block; margin-left: auto; margin-right: auto;" src="https://www.possibility.fr/wp-content/uploads/2019/05/recrutement-2.png" alt="Italian Trulli">
  </div>
 </body>
 </html>

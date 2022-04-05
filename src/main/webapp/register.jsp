@@ -10,44 +10,44 @@
 <body>
 <jsp:include page="/Shared/header.jsp"></jsp:include>
 	<div class="container">
-		<div class="row text-center" style="color: tomato;">
+		<div class="row text-center mt-5" style="color: tomato;">
 			<h2>Ajout d'offre</h2>
 		</div>
 		<hr>
-		<div class="row col-md-10">
+		<div >
+			<div class=" row col-md-6">
+				<div class="card card-body">
+					<div class="col-md-12 col-md-offset-3">
+						<form
+							action="<%=request.getContextPath()%>/UserController/inserer"
+							method="post">
 
-			<div class="card card-body">
+							<div class="form-group">
+								<label for="titre">Titre:</label> <input type="text"
+									class="form-control" id="titre" placeholder="Titre de l'offre"
+									name="titre" required>
+							</div>
 
-				
-				<div class="col-md-8 col-md-offset-3">
+							<div class="form-group">
+								<label for="description">description:</label>
+								<textarea type="text" class="form-control" id="description"
+									placeholder="description de l' offre" rows="3"
+									name="description" required></textarea>
+							</div>
 
-					<form action="<%=request.getContextPath()%>/UserController/inserer"
-						method="post">
+							<div class="form-group col-md-4">
+								<label for="inputType">Type</label> <select id="inputType"
+									name="inputType" class="form-select">
+									<option value="cdi">CDI</option>
+									<option value="cdd">CDD</option>
+									<option value="stage">Stage</option>
+								</select>
+							</div>
 
-						<div class="form-group">
-							<label for="titre">Titre:</label> <input type="text"
-								class="form-control" id="titre" placeholder="Titre de l'offre"
-								name="titre" required>
-						</div>
+							<button type="submit" class="btn btn-primary mt-5">Submit</button>
 
-						<div class="form-group">
-							<label for="description">description:</label> <input type="text"
-								class="form-control" id="description"
-								placeholder="description de l' offre" name="description"
-								required>
-						</div>
-						<div class="form-group ">
-							<label for="inputType">Type</label> <select id="inputType"
-								name="inputType" class="form-control">
-								<option value="cdi">CDI</option>
-								<option value="cdd">CDD</option>
-								<option value="stage">Stage</option>
-							</select>
-						</div>
-
-						<button type="submit" class="btn btn-primary">Submit</button>
-
-					</form>
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>

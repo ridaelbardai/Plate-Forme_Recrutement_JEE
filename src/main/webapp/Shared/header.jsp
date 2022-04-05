@@ -28,6 +28,8 @@
 			</c:if>
 				<li class="nav-item"><a class="nav-link"
 					href="<%=request.getContextPath()%>/UserController/offres">Offres</a></li>
+					<li class="nav-item"><a class="nav-link"
+					href="<%=request.getContextPath()%>/UserController/logout">Deconnexion</a></li>
 			</ul>
 		</div>
 	</nav>

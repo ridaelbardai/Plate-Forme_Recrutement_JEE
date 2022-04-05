@@ -13,7 +13,7 @@
 	<div class="container">
 		<div class="row col-md-10 col-md-offset-3">
 			<div class="card card-body">
-				<h1>User successfully registered!</h1>
+				<h1>Offre ajouté</h1>
 			</div>
 		</div>
 	</div>

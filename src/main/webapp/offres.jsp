@@ -17,8 +17,11 @@
 		<c:forEach items="${lo}" var="item">
 			<div class="card mt-3">
 				<div class="card-header">
-					<div class="card-title">
+					<div class="card-title fw-bold">
 						<c:out value='${item.getTitre()}' />
+					</div>
+					<div class="card-title d-flex justify-content-end">
+						<c:out value='${item.getDate()}' />
 					</div>
 				</div>
 				<div class="card-body">
