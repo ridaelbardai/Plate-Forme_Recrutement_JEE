@@ -33,6 +33,10 @@
 						<a class="btn btn-primary"
 							href="<%=request.getContextPath()%>/UserController/supprimer?id=${item.getId()}"
 							class="card-link">Supprimer</a>
+							
+							<a class="btn btn-primary"
+							href="<%=request.getContextPath()%>/UserController/demandes?id=${item.getId()}"
+							class="card-link">voir demandes</a>
 					</c:if>
 
 					<c:if test="${user.getType() == 'u'}">

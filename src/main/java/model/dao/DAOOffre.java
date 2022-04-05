@@ -7,6 +7,7 @@ import org.hibernate.Transaction;
 
 import controller.UserController;
 import model.bo.Offre;
+import model.bo.Postulations;
 import model.bo.User;
 import model.service.HibernateUtil;
 
@@ -88,4 +89,7 @@ public class DAOOffre {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		return session.createQuery("FROM Offre WHERE createur ="+ UserController.userSession.getId()).list();
 	}
+
+
+
 }

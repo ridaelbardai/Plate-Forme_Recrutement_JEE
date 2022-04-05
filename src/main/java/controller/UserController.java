@@ -1,6 +1,8 @@
 package controller;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -52,9 +54,15 @@ public class UserController extends HttpServlet {
 		case "/inscription":
 			inscription(request, response);
 			break;
+
+		case "/mesoffres":
+
+			break;
+
 		case "/postuler":
 			postuler(request, response);
 			break;
+
 		default:
 			break;
 		}
@@ -94,39 +102,84 @@ public class UserController extends HttpServlet {
 			deleteOffre(request, response);
 			listOffresuser(request, response);
 			break;
+		case "/demandes":
+			mesoffres(request, response);
+			break;
 		case "/demande":
-			int idp = Integer.parseInt(request.getParameter("id"));
-			System.out.println(idp);
-			dispatcher = request.getRequestDispatcher("/Postuler.jsp");
+			dispatcher = request.getRequestDispatcher("/demande.jsp");
 			dispatcher.forward(request, response);
 			break;
+		case "/DownloadServlet":
+			response.setContentType("text/html");
+			PrintWriter out = response.getWriter();
+			String filename = request.getParameter("nom");
+			String filepath = "c:\\upload\\";
+			response.setContentType("APPLICATION/OCTET-STREAM");
+			// response.setHeader("Content-Disposition", "attachment; filename=\"" +
+			// filename + "\"");
+
+			// use inline if you want to view the content in browser, helpful for pdf file
+			response.setHeader("Content-Disposition", "inline; filename=\"" + filename + "\"");
+			FileInputStream fileInputStream = new FileInputStream(filepath + filename);
+
+			int i;
+			while ((i = fileInputStream.read()) != -1) {
+				out.write(i);
+			}
+			fileInputStream.close();
+			out.close();
+
+			break;
+
 		default:
 			break;
 		}
 
 	}
 
+	private void mesoffres(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		int id = Integer.parseInt(request.getParameter("id"));
+		List<Postulations> mo = new DAOPostulations().getListDemandes(id);
+		System.out.println("liste des offres :");
+		System.out.println(mo);
+		request.setAttribute("mo", mo);
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/demandes.jsp");
+		dispatcher.forward(request, response);
+
+	}
+
 	private void postuler(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		/* Receive file uploaded to the Servlet from the HTML5 form */
+
 		Part filePart = request.getPart("cv");
-		String cv = filePart.getSubmittedFileName();
+		String cv = request.getPart("cv").getSubmittedFileName();
+		// cv.concat(filePart.getSubmittedFileName());
+		System.out.println("cv : " + cv);
 		for (Part part : request.getParts()) {
-			part.write("C:\\upload\\" + cv);
+			part.write("C:\\upload\\" + filePart.getSubmittedFileName());
 		}
 
 		filePart = request.getPart("lm");
-		String lm = filePart.getSubmittedFileName();
-		for (Part part : request.getParts()) {
-			part.write("C:\\upload\\" + lm);
-		}
+		String lm = request.getPart("lm").getSubmittedFileName();
+		;
+//		lm.concat(filePart.getSubmittedFileName());
+		System.out.println("lm : " + lm);
 
+		for (Part part : request.getParts()) {
+			part.write("C:\\upload\\" + filePart.getSubmittedFileName());
+		}
 		// acceder a la session pour utiliser les donnees d'utilisateur courant
 		int id = Integer.parseInt(request.getParameter("id"));
+
+		HttpSession session = request.getSession();
+		// session.getAttribute("user");
+
 		Offre o = new DAOOffre().getOffreByID(id);
 
 		Postulations post = new Postulations(cv, lm);
-		post.setDemandeur(userSession);
+		post.setDemandeur((User) session.getAttribute("user"));
 		post.setOffre(o);
 
 		new DAOPostulations().postuler(post);
@@ -171,7 +224,7 @@ public class UserController extends HttpServlet {
 		}
 	}
 
-	//MAJ
+	// MAJ
 	private void updateOffre(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String titre = request.getParameter("titre");
@@ -190,7 +243,8 @@ public class UserController extends HttpServlet {
 		new DAOOffre().updateOffre(o);
 
 	}
-	//afficher les offres pour un utilisateur
+
+	// afficher les offres pour un utilisateur
 	private void listOffresuser(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		List<Offre> lo = new DAOOffre().getListOffres();
@@ -199,8 +253,7 @@ public class UserController extends HttpServlet {
 		dispatcher.forward(request, response);
 	}
 
-	
-	//afficher les offres pour un admin
+	// afficher les offres pour un admin
 	private void listOffresadmin(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		List<Offre> lo = new DAOOffre().getListOffresadmin();
@@ -210,7 +263,7 @@ public class UserController extends HttpServlet {
 
 	}
 
-	//inserer une offre
+	// inserer une offre
 	private void register(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		// pour garder les informations comme titre, description, type d'offre
@@ -236,7 +289,7 @@ public class UserController extends HttpServlet {
 		dispatcher.forward(request, response);
 	}
 
-	//authentification
+	// authentification
 	private void authenticate(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		DAOUser loginDao = new DAOUser();
 		String username = request.getParameter("email");
